@@ -9,8 +9,13 @@ namespace PDS_Part_A
 {
     internal class Program
     {
-        public static int amount = 100_000;
+        public static int amount = 1000;
         public static int[] nthreads = {0, 2, 3, 4, 6}; //number of threads
+        public static IDictionary<int, int> SearchedTypes = new Dictionary<int, int>(){
+            {1,30}, // 30 items of value 1
+            {7,15}, //15 items of value 7
+            {8,10} //8 items of value 10
+        };
 
         static void Main(string[] args)
         {
@@ -183,50 +188,87 @@ namespace PDS_Part_A
 
         static void Task02()
         {
-            //generate random array
-            List<string> array = new List<string>();
-            TypesAndNumber(array);
+            var sum = SearchedTypes.Values.Sum();
+            var array = new string[amount- sum];
+            array = TypesAndNumber(array.ToList()); //add SearchedTypes to array
+            Console.WriteLine("Length: " + array.Length);
 
-            Random random = new Random();
-            var barcode = $"{random.Next(0, 99999).ToString("00000")}-{random.Next(1, 100).ToString("000")}";
-
-
-            for (var i = array.Count; i < (amount - array.Count); i++)
+            //shuffle generated barcodes and fulfill remain cells in array
+            for (var i = 0; i < array.Length; i++)
             {
-                var temp = 0;
-                var y = random.Next(0, amount - 1);
-               // temp = array[i];
-               //array[i] = array[y];
-               //array[y] = temp;
+                var temp = "";
+                Random random = new Random();
+                var y = i + random.Next(0, array.Length - i);
+                temp = array[y];
+                array[y] = array[i];
+                array[i] = temp;
+                if (array[i] == null)
+                {
+                    array[i] = GenerateBarcode();
+                }
+                if (array[i] == null)
+                {
+                    array[i] = GenerateBarcode();
+                }
             }
 
+            //find elements for each type
+            var elements = FindBarcodes(array);
+            foreach (KeyValuePair<int, List<string>> element in elements)
+            {
+                Console.WriteLine($"type: {element.Key} | elements: {string.Join(", ", element.Value)}");
+              //  Console.WriteLine(string.Join(", ", element.Value.ToArray()));
+            }
         }
+
         static string GenerateBarcode()
         {
             Random random = new Random();
-            var barcode = $"{random.Next(0, 99999).ToString("00000")}-{random.Next(1, 100).ToString("000")}";
+            var barcode = $"{random.Next(0, 99999).ToString("00000")}{random.Next(1, 100).ToString("000")}";
             return barcode;
         }
 
-        static List<string> TypesAndNumber(List<string> array)
+        static string [] TypesAndNumber(List<string> array)
         {
-            IDictionary<int, int> SearchedTypes = new Dictionary<int, int>();
-            SearchedTypes.Add(1, 30); // 30 items of type 1
-            SearchedTypes.Add(7, 15); //15 items of type 7
-            SearchedTypes.Add(8, 10); //8 items of type 10
-
-
-            foreach (KeyValuePair<int, int> type in SearchedTypes)
+            foreach (KeyValuePair<int, int> value in SearchedTypes)
             {
-                for (var i = 0; i < type.Value; i++)
+                for (var i = 0; i < value.Value; i++)
                 {
                     Random random = new Random();
-                    var barcode = $"{random.Next(0, 99999).ToString("00000")}-{type.Key.ToString("000")}";
+                    var barcode = $"{random.Next(0, 99999).ToString("00000")}{value.Key.ToString("000")}";
                     array.Add(barcode);
-                    Console.WriteLine(barcode);
                 }
             }
-            return array;
+            return array.ToArray();
+        }
+
+
+        static IDictionary<int, List<string>> FindBarcodes(string[] array)
+        {
+            IDictionary<int, List<string>> Typeselements = new Dictionary<int, List<string>>();
+            var count = 0;
+
+            foreach (KeyValuePair<int, int> value in SearchedTypes)
+            {
+                count = 0;
+                List<string> elements = new List<string>();
+                for (var i = 0; i < array.Length; i++)
+                {
+                    var type = value.Key.ToString("000");
+                    var barcode = array[i].Substring(5, 3);
+                    if (barcode == type&& count< value.Value)
+                    {
+                        elements.Add(array[i]);
+                       // Console.WriteLine($"barcode: {barcode}, index: {i}, {array[i]}");
+                        count++;
+
+                    }
+                }
+                Typeselements.Add(value.Key, elements);
+              //  Console.WriteLine($"type: {value.Key}, elements: {string.Join(", ", elements)}");
+            }
+            return Typeselements;
+
         }
     }
 }
