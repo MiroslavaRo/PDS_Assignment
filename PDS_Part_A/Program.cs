@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace PDS_Part_A
 {
     internal class Program
     {
-        public static int amount = 1000;
-        public static int[] nthreads = {0, 2, 3, 4, 6}; //number of threads
+        public static int amount = 1_000;
+        static readonly object locker = new object();
+        public static int[] nthreads = {1, 2, 3, 4, 6}; //number of threads
         public static IDictionary<int, int> SearchedTypes = new Dictionary<int, int>(){
             {1,30}, // 30 items of value 1
             {7,15}, //15 items of value 7
@@ -35,21 +38,29 @@ namespace PDS_Part_A
 
             //---------------------------------------
             Console.WriteLine("TASK 2");
-           // foreach (var n in nthreads)
-           // {
-            //    Console.Write($"Time to process with {} threads: ");
-                stopwatch.Reset();
-                stopwatch.Start();
-                Task02();
-                stopwatch.Stop();
-                Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
+            // Console.Write($"Time to process with {n} threads: ");
+            stopwatch.Start();
+            Task02(2);
+            stopwatch.Stop();
+           // Console.Write($"Time to process with {n} threads: ");
+            Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
+            stopwatch.Reset();
+            /* foreach (var n in nthreads)
+             {
+                // Console.Write($"Time to process with {n} threads: ");
+                 stopwatch.Start();
+                 Task02(n);
+                 stopwatch.Stop();
+                 Console.Write($"Time to process with {n} threads: ");
+                 Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
+                 stopwatch.Reset();
 
-           // }
+             }*/
 
             Console.WriteLine($"FINISHED");
             Console.Read();
         }
-
+        
 
         static void Task01(int numOfthreads)
         {
@@ -118,7 +129,7 @@ namespace PDS_Part_A
             var maxNum = array.Max();
             List<int>[] subLists = new List<int>[numOfthreads];
             var splitFactor = maxNum / numOfthreads;
-//            Console.WriteLine($"max number: {maxNum}\nsplit: {splitFactor}");
+          //  Console.WriteLine($"max number: {maxNum}\nsplit: {splitFactor}");
 
             for (var j = 0; j < numOfthreads - 1; j++)
             {
@@ -141,7 +152,7 @@ namespace PDS_Part_A
             return subLists;
         }
 
-        static void ThreadsWork(int numOfthreads, List<int>[] subLists)
+        static void ThreadsWorkBubble(int numOfthreads, List<int>[] subLists)
         {
             //start threads
             var threads = new List<Thread>();
@@ -163,12 +174,11 @@ namespace PDS_Part_A
 
         static int[] ParallelSorting(List<int> array, int numOfthreads)
         {
-
             //make sublists
             var subLists = GenerateSubList(array, numOfthreads);
 
             //start and after stop threads
-            ThreadsWork(numOfthreads,subLists);
+            ThreadsWorkBubble(numOfthreads,subLists);
 
             //merge all sublists to sorted list
             var sortedList = new List<int>();
@@ -184,14 +194,13 @@ namespace PDS_Part_A
             return sortedList.ToArray();
         }
 
+        /*------------------------------------------------------------*/
 
-
-        static void Task02()
+        static void Task02(int numOfthreads)
         {
             var sum = SearchedTypes.Values.Sum();
             var array = new string[amount- sum];
             array = TypesAndNumber(array.ToList()); //add SearchedTypes to array
-            Console.WriteLine("Length: " + array.Length);
 
             //shuffle generated barcodes and fulfill remain cells in array
             for (var i = 0; i < array.Length; i++)
@@ -204,29 +213,33 @@ namespace PDS_Part_A
                 array[i] = temp;
                 if (array[i] == null)
                 {
-                    array[i] = GenerateBarcode();
-                }
-                if (array[i] == null)
-                {
-                    array[i] = GenerateBarcode();
+                    array[i] = $"{random.Next(0, 99999).ToString("00000")}{random.Next(1, 100).ToString("000")}"; ;
                 }
             }
+            
+            //make sublists
+            var subLists = GenerateSubArrays(array.ToList(), numOfthreads);
 
-            //find elements for each type
-            var elements = FindBarcodes(array);
-            foreach (KeyValuePair<int, List<string>> element in elements)
+            IDictionary<int, List<string>> Typeselements = new Dictionary<int, List<string>>();
+
+            //start and after stop threads
+            ThreadsWorkBarcodes(numOfthreads, subLists, Typeselements);
+
+           /* for (int i = 0; i < numOfthreads; i++)
             {
-                Console.WriteLine($"type: {element.Key} | elements: {string.Join(", ", element.Value)}");
-              //  Console.WriteLine(string.Join(", ", element.Value.ToArray()));
+                var list = subLists[i].ToArray();
+                var thread = new Thread(() => FindBarcodes(list, Typeselements));
+                thread.Start();
+            }*/
+
+            // FindBarcodes(array, Typeselements);
+
+            foreach (KeyValuePair<int, List<string>> element in Typeselements)
+            {
+                Console.WriteLine($"type: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
             }
         }
 
-        static string GenerateBarcode()
-        {
-            Random random = new Random();
-            var barcode = $"{random.Next(0, 99999).ToString("00000")}{random.Next(1, 100).ToString("000")}";
-            return barcode;
-        }
 
         static string [] TypesAndNumber(List<string> array)
         {
@@ -241,34 +254,87 @@ namespace PDS_Part_A
             }
             return array.ToArray();
         }
-
-
-        static IDictionary<int, List<string>> FindBarcodes(string[] array)
+        static void FindBarcodes(string[] array, IDictionary<int, List<string>> Typeselements)
         {
-            IDictionary<int, List<string>> Typeselements = new Dictionary<int, List<string>>();
-            var count = 0;
 
             foreach (KeyValuePair<int, int> value in SearchedTypes)
             {
-                count = 0;
                 List<string> elements = new List<string>();
                 for (var i = 0; i < array.Length; i++)
                 {
                     var type = value.Key.ToString("000");
                     var barcode = array[i].Substring(5, 3);
-                    if (barcode == type&& count< value.Value)
+
+                    if (elements.Count < value.Value)
                     {
-                        elements.Add(array[i]);
-                       // Console.WriteLine($"barcode: {barcode}, index: {i}, {array[i]}");
-                        count++;
+                        lock (locker)
+                        {
+                            if (barcode == type)
+                            {
+                                elements.Add(array[i]);
+                            }
+                        }
 
                     }
+                    else
+                    {
+                        break;
+                    }
+
+
                 }
+                //TO DO (found enter for same key)
                 Typeselements.Add(value.Key, elements);
-              //  Console.WriteLine($"type: {value.Key}, elements: {string.Join(", ", elements)}");
             }
-            return Typeselements;
+           // return Typeselements;
 
         }
+        static List<string>[] GenerateSubArrays(List<string> array, int numOfthreads)
+        {
+            List<string>[] subarray = new List<string>[numOfthreads];
+            var splitFactor = array.Count/ numOfthreads;
+
+            for (var j = 0; j < numOfthreads - 1; j++)
+            {
+                subarray[j] = new List<string>();
+
+                for (int i = 0; i < array.Count; i++)
+                {
+                    if (i < splitFactor * (j + 1))
+                    {
+                        var value = array[i];
+                        subarray[j].Add(value);
+                    }
+                }
+                array.RemoveAll(a => subarray[j].Contains(a));
+            }
+            //add remaining values to the last sublist
+            subarray[subarray.Length - 1] = array;
+
+
+            return subarray;
+        }
+        static void ThreadsWorkBarcodes(int numOfthreads, List<string>[] subLists, IDictionary<int, List<string>> Typeselements)
+        {
+            //start threads
+            var threads = new List<Thread>();
+
+            for (int i = 0; i < numOfthreads; i++)
+            {
+                var list = subLists[i].ToArray();
+                var thread = new Thread(() => FindBarcodes(list, Typeselements));
+                thread.Start();
+                threads.Add(thread);
+            }
+
+            //stop threads
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+           // return Typeselements;
+        }
+
+
     }
 }
