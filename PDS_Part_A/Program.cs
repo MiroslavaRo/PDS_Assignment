@@ -53,8 +53,8 @@ namespace PDS_Part_A
             var stopwatch = new Stopwatch();
 
             
-            Console.WriteLine("TASK 1");
-
+            //Console.WriteLine("TASK 01");
+            /*
             //generate random array
             int[] array = new int[amount];
             for (var i = 0; i < array.Length; i++)
@@ -72,23 +72,23 @@ namespace PDS_Part_A
                 Task01(n, array);
                 stopwatch.Stop();
                 Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
-            }
+            }*/
             
             Console.WriteLine("---------------------------------------");
 
-            Console.WriteLine("TASK 2");
+            Console.WriteLine("TASK 02");
 
             //generate list of barcodes
             var list = GenerateBarcodes();
 
             foreach (var n in nthreads)
              {
-                // Console.Write($"Time to process with {n} threads: ");
-                Console.Write($"Time to process with {n} threads: ");
                 stopwatch.Reset();
                 stopwatch.Start();
+                Console.WriteLine("---------------------------------------");
                 Task02(n, list);
                 stopwatch.Stop();
+                Console.Write($"\nTime to process with {n} threads: ");
                 Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
 
             }
@@ -218,34 +218,37 @@ namespace PDS_Part_A
 
         /*------------------------------------------------------------*/
         #region task02
-
         
         static void Task02(int numOfthreads, List<string> list)
-        {
-            var typesElements = ThreadBarcodeSearch(numOfthreads,list);
-            foreach (KeyValuePair<int, List<string>> element in typesElements)
-            {
-               //Console.WriteLine($"type-amount: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
-            }
-        }
-
-        static IDictionary<int, List<string>> ThreadBarcodeSearch(int numOfthreads, List<string> list)
         {
             //make sublists for threads searching
             var subLists = GenerateBarcodesSubLists(list, numOfthreads);
 
+
+            //create a dictionary with elements of specific type
+            //(types as keys from SearchedTypesIndexes)
             IDictionary<int, List<string>> typesElements = new Dictionary<int, List<string>>();
-            var nelist = new List<string>();
+
+            //create seperated lists for each key as a common buffer for all threads
+            List<string>[] elements = new List<string>[SearchedTypesIndexes.Count];
+            var y = 0;
             foreach (KeyValuePair<int, int> value in SearchedTypesIndexes)
             {
-                typesElements.Add(value.Key, nelist);
+                elements[y] = new List<string>();
+                typesElements.Add(value.Key, elements[y]);
+                y++;
             }
 
             //search barcodes with threads
             ThreadsWorkBarcodes(numOfthreads, subLists, typesElements);
 
-            return typesElements;
-        } 
+
+            //display dictionary with lists of elements for each type
+            foreach (KeyValuePair<int, List<string>> element in typesElements)
+            {
+               Console.WriteLine($"type-amount: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
+            }
+        }
         static List<string> GenerateBarcodes()
         {
             var length = amount;
@@ -308,19 +311,12 @@ namespace PDS_Part_A
         static void ThreadsWorkBarcodes(int numOfthreads, List<string>[] subLists, IDictionary<int, List<string>> Typeselements)
         {
 
-            //common buffer for all threads
-            List<string>[] elements = new List<string>[SearchedTypesIndexes.Count];
-            for (var i = 0; i < SearchedTypesIndexes.Count; i++)
-            {
-                elements[i] = new List<string>();
-            }
-
             //start threads
             var threads = new List<Thread>();
             for (int i = 0; i < numOfthreads; i++)
             {
                 var list = subLists[i];
-                var thread = new Thread(() => FindBarcodes(list, Typeselements, elements));
+                var thread = new Thread(() => FindBarcodes(list, Typeselements,i));
                 thread.Start();
                 threads.Add(thread);
             }
@@ -332,30 +328,33 @@ namespace PDS_Part_A
             }
 
         }
-        static IDictionary<int, List<string>> FindBarcodes(List<string> list, IDictionary<int, List<string>> typesElements, List<string>[] elements)
+        static IDictionary<int, List<string>> FindBarcodes(List<string> list, IDictionary<int, List<string>> typesElements, int threadindex)
         {
-            var j = 0;
             foreach (KeyValuePair<int, int> value in SearchedTypesIndexes)
             {
                 for (var i = 0; i < list.Count; i++)
                 {
                     var type = value.Key.ToString("000");
                     var barcode = list[i].Substring(5, 3);
-
-                    if (elements[j].Count < value.Value)
-                    {
-                        if (barcode == type)
+                    if (barcode == type) {
+                        lock (locker)
                         {
-                            elements[j].Add(list[i]);
-                        }                        
+                            if (typesElements[value.Key].Count < value.Value)
+                            {
+                                typesElements[value.Key].Add(list[i]);
+                                Console.WriteLine($"thread({threadindex}) element: {list[i]} | index: {i} ");
+
+                            }
+                            else
+                            {
+                                break;
+                            }
+
+                        }
+
                     }
-                    else
-                    {
-                        break;
-                    }
+                    
                 }
-                typesElements[value.Key] = elements[j];
-                j++;
             }
 
             return typesElements;
