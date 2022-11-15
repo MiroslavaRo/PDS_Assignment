@@ -85,10 +85,9 @@ namespace PDS_Part_A
              {
                 stopwatch.Reset();
                 stopwatch.Start();
-                Console.WriteLine("---------------------------------------");
                 Task02(n, list);
                 stopwatch.Stop();
-                Console.Write($"\nTime to process with {n} threads: ");
+                Console.Write($"Time to process with {n} threads: ");
                 Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
 
             }
@@ -100,6 +99,7 @@ namespace PDS_Part_A
         #region task01
         static void Task01(int numOfthreads, int[] array)
         {
+
             int[] sorted = new int[amount];
             if (numOfthreads > 1)
             {
@@ -246,7 +246,7 @@ namespace PDS_Part_A
             //display dictionary with lists of elements for each type
             foreach (KeyValuePair<int, List<string>> element in typesElements)
             {
-               Console.WriteLine($"type-amount: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
+             //  Console.WriteLine($"type-amount: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
             }
         }
         static List<string> GenerateBarcodes()
@@ -344,7 +344,7 @@ namespace PDS_Part_A
                             if (typesElements[value.Key].Count < value.Value)
                             {
                                 typesElements[value.Key].Add(list[i]);
-                                Console.WriteLine($"thread({threadindex}) element: {list[i]} | index: {i} ");
+                                //Console.WriteLine($"thread({threadindex}) element: {list[i]} | index: {i} ");
 
                             }
                             else
