@@ -53,8 +53,8 @@ namespace PDS_Part_A
             var stopwatch = new Stopwatch();
 
             
-            //Console.WriteLine("TASK 01");
-            /*
+            Console.WriteLine("TASK 01");
+            
             //generate random array
             int[] array = new int[amount];
             for (var i = 0; i < array.Length; i++)
@@ -72,7 +72,7 @@ namespace PDS_Part_A
                 Task01(n, array);
                 stopwatch.Stop();
                 Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
-            }*/
+            }
             
             Console.WriteLine("---------------------------------------");
 
@@ -298,9 +298,11 @@ namespace PDS_Part_A
                 sublists[i] = new List<string>();
             }
 
-            //add elements until the length of sublist is equal to splitFactor
+            //add elements till the quotient from division (index of element/splitfactor)
+            //rounded down is less than index of sub-list
             for (int i = 0; i < list.Count; i++)
             {
+                //the quotient rounded down shows to which sub-list element belongs
                 int j = Convert.ToInt32(Math.Floor(Convert.ToDouble(i) / Convert.ToDouble(splitFactor)));
                 var value = list[i];
                 sublists[j].Add(value);
