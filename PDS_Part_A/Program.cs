@@ -149,7 +149,7 @@ namespace PDS_Part_A
             }
             return array;
         }
-        static List<int>[] GenerateSubList(List<int> array, int numOfthreads) 
+        static List<int>[] GenerateSortingSubLists(List<int> array, int numOfthreads) 
         {             
             var maxNum = array.Max();
             List<int>[] subLists = new List<int>[numOfthreads];
@@ -197,7 +197,7 @@ namespace PDS_Part_A
         static int[] ThreadSorting(List<int> array, int numOfthreads)
         {
             //make sublists
-            var subLists = GenerateSubList(array, numOfthreads);
+            var subLists = GenerateSortingSubLists(array, numOfthreads);
 
             //start and after stop threads
             ThreadsWorkBubble(numOfthreads,subLists);
@@ -232,7 +232,7 @@ namespace PDS_Part_A
         static IDictionary<int, List<string>> ThreadBarcodeSearch(int numOfthreads, List<string> list)
         {
             //make sublists for threads searching
-            var subLists = GenerateSubArrays(list, numOfthreads);
+            var subLists = GenerateBarcodesSubLists(list, numOfthreads);
 
             IDictionary<int, List<string>> typesElements = new Dictionary<int, List<string>>();
             var nelist = new List<string>();
@@ -285,7 +285,7 @@ namespace PDS_Part_A
             }
             return array.ToList();
         }
-        static List<string>[] GenerateSubArrays(List<string> origList, int numOfthreads)
+        static List<string>[] GenerateBarcodesSubLists(List<string> origList, int numOfthreads)
         {
             var list = new List<string>(origList);
             List<string>[] sublists = new List<string>[numOfthreads];
