@@ -10,12 +10,11 @@ namespace PDS_Part_B
 {
     internal class Program
     {
-        public static int amount = 50_00;
+        public static int amount = 10_00;
         public static int circlesAmount = 1000; //the number of the circles
         public static int paintingTime = 20; //20 msec
         static readonly object locker = new object();
         public static int[] workers = {1, 5, 20, 100 }; //number of workers
-       // public static int k = 20;
 
         static void Main(string[] args)
         {
@@ -33,44 +32,27 @@ namespace PDS_Part_B
             var stopwatch = new Stopwatch();
             for (var i = 0; i < workers.Length; i++)
             {
-                circlesAmount= temp;
-                var k = workers[i];
-                Console.WriteLine("START");
-                stopwatch.Restart();
+                for (var j =0; j<2; j++)
+                {
+                    circlesAmount = temp;
+                    var k = workers[i];
+                    Console.WriteLine($"START for {k} workers (Option {j+1})");
+                    stopwatch.Restart();
+                    if (j == 0) { ThreadsWork01(circleList, k); } else { ThreadsWork02(circleList, k); }
+                    stopwatch.Stop();
+                    Console.Write($"Time to impliment with {k} workers (Option {j+1}): ");
+                    Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
+                    Console.WriteLine("---------------------------------------\n");
 
-                ThreadsWork01(circleList, k);
-                stopwatch.Stop();
-                Console.WriteLine("---------------------------------------");
-
-                Console.Write($"Time to impliment with {k} workers (Option 1): ");
-                Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
-
-                Console.Write($"Press enter to continue...\n");
-
-                Console.ReadLine();
-
-
-                //--------------------------------------------------------------//
-                stopwatch.Reset();
-                stopwatch.Restart();
-
-
-                Console.WriteLine("START");
-                circlesAmount = temp;
-                ThreadsWork02(circleList, k);
-                Console.WriteLine("---------------------------------------");
-                stopwatch.Stop();
-                Console.Write($"Time to impliment with {k} workers (Option 2): ");
-                Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
-
-                Console.ReadLine();
+                    //Console.Write($"Press enter to continue...\n");
+                   // Console.ReadLine();
+                }
 
             }
             
 
 
         }
-
         static string[] GenerateCoordinates()
         {
             var coordinates = new string[amount];
@@ -86,13 +68,12 @@ namespace PDS_Part_B
 
             return coordinates;
         }
+
+
         static void ThreadsWork01(string[] circleList, int k)
         {
-           // var n = circlesAmount;           
-
             IDictionary<int, List<string>> workerLists = new Dictionary<int, List<string>>();
-            var lastIndexes = new List<int>();
-            lastIndexes.Add(0);
+            var lastIndexes = new List<int>() { -1 };
 
             //start threads
             var threads = new List<Thread>();
@@ -114,10 +95,9 @@ namespace PDS_Part_B
             var sum = 0;
             foreach (var kvp in workerLists)
             {
-             //   Console.WriteLine($"Length: {kvp.Value.Count}");
-                sum+= kvp.Value.Count;
+                Console.WriteLine($"Worker id {kvp.Key}: \t Painted circles: {kvp.Value.Count}"); //{string.Join(";", kvp.Value)}"); //\t Painted circles: {kvp.Value.Count}");
+                Console.WriteLine($"Length: {kvp.Value.Count}");
             }
-          //  Console.WriteLine($"\nFULL LENGTH: {sum}");
 
         }
 
@@ -126,9 +106,8 @@ namespace PDS_Part_B
             //var n = circlesAmount;
 
             IDictionary<int, List<string>> workerLists = new Dictionary<int, List<string>>();
-            var lastIndexes = new List<int>();
-            lastIndexes.Add(0);
-
+            
+            
 
             //start threads
             var threads = new List<Thread>();
@@ -150,12 +129,9 @@ namespace PDS_Part_B
             var sum = 0;
             foreach (var kvp in workerLists)
             {
-               // Console.WriteLine($"\n---------------WorkerList {kvp.Key}--------------");
-              //  Console.WriteLine(string.Join("\n", kvp.Value));
-                //Console.WriteLine($"Length: {kvp.Value.Count}");
-                sum += kvp.Value.Count;
+                Console.WriteLine($"Worker id {kvp.Key}: \t Painted circles: {kvp.Value.Count}"); //{string.Join(";", kvp.Value)}"); //\t Painted circles: {kvp.Value.Count}");
+                Console.WriteLine($"Length: {kvp.Value.Count}");
             }
-           // Console.WriteLine($"\nFULL LENGTH: {sum}");
 
         }
 
@@ -166,7 +142,6 @@ namespace PDS_Part_B
         static void PaintCircleMax(string[] circleList, IDictionary<int, List<string>> workerLists, List<int> lastIndexes)
         {
             var thread = Thread.CurrentThread;
-            var contain = false;
 
             //itarating the dictionary for current worker
             var id = thread.ManagedThreadId;
@@ -185,11 +160,16 @@ namespace PDS_Part_B
                     {
                         break;
                     }
+                    //to paint 0 index circle
+                    if(lastIndexes.Last() == -1)
+                    {
+                        workerLists[id].Add(circleList[i]);
+                    }
                     var max = lastIndexes.Last();
                     Thread.Sleep(paintingTime);
                     i = max = max+1;
                     workerLists[id].Add(circleList[i]);
-                    //Console.WriteLine($"Circle {i} for {id} Painting....\n");
+                   // Console.WriteLine($"Circle {i} for {id} Painting....\n");
                     
                     lastIndexes.Add(max);
                     
@@ -242,7 +222,7 @@ namespace PDS_Part_B
                     {
                         Thread.Sleep(paintingTime);
                         workerLists[id].Add(circleList[i]);
-                      //  Console.WriteLine("Painting....\n");
+                       // Console.WriteLine("Painting....\n");
                     }
                     else
                     {
