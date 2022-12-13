@@ -13,7 +13,7 @@ namespace PDS_Part_A
 {
     internal class Program
     {
-        public static int amount = 100_000;
+        public static int amount = 10_000;
         static readonly object locker = new object();
         public static int[] nthreads = {1, 2, 3, 4, 6}; //number of threads
         public static IDictionary<int, int> SearchedTypesIndexes = new Dictionary<int, int>(){
@@ -62,17 +62,16 @@ namespace PDS_Part_A
                 Random random = new Random();
                 array[i] = random.Next(1, amount);
             }
-
+            /*
             foreach (var n in nthreads)
             {
-                Console.Write($"Time to process with {n} threads: ");
                 stopwatch.Reset();
                 stopwatch.Start();
-
                 Task01(n, array);
                 stopwatch.Stop();
-                Console.Write($"{stopwatch.ElapsedMilliseconds} miliseconds\n");
-            }
+                Console.WriteLine($"Time to process with {n} threads: {stopwatch.ElapsedMilliseconds} miliseconds\n"); 
+                Console.WriteLine("---------------------------------------");
+            }*/
             
             Console.WriteLine("---------------------------------------");
 
@@ -99,20 +98,20 @@ namespace PDS_Part_A
         #region task01
         static void Task01(int numOfthreads, int[] array)
         {
-
             int[] sorted = new int[amount];
-            if (numOfthreads > 1)
-            {
-                //devide array to smaller parts by [threads], sort each of them and then merge
-                sorted = ThreadSorting(array.ToList(), numOfthreads);
 
+           // if (numOfthreads > 1)
+          //  {
+                //devide array to smaller parts by [threads], sort each of them and then merge
+              //  sorted = ThreadSorting(array.ToList(), numOfthreads);
+/*
             }
             else
             {
                 //sort without threads
                 sorted = BubbleSortArray(array);
 
-            }
+            }*/
         }
         static void BubbleSortList(List<int> array)
         {
@@ -196,11 +195,21 @@ namespace PDS_Part_A
         }
         static int[] ThreadSorting(List<int> array, int numOfthreads)
         {
+            var stopwatch1 = new Stopwatch();
+            stopwatch1.Start();
             //make sublists
             var subLists = GenerateSortingSubLists(array, numOfthreads);
 
+            stopwatch1.Stop();
+            Console.WriteLine($"BEFORE THREADS: {stopwatch1.ElapsedMilliseconds} miliseconds");
+            stopwatch1.Restart();
+
+
             //start and after stop threads
             ThreadsWorkBubble(numOfthreads,subLists);
+
+            stopwatch1.Stop();
+            Console.WriteLine($"AFTER FINISH THREADS: {stopwatch1.ElapsedMilliseconds} miliseconds");
 
             //merge all sublists to sorted list
             var sortedList = new List<int>();
@@ -221,6 +230,9 @@ namespace PDS_Part_A
         
         static void Task02(int numOfthreads, List<string> list)
         {
+            var stopwatch1 = new Stopwatch();
+            stopwatch1.Start();
+
             //make sublists for threads searching
             var subLists = GenerateBarcodesSubLists(list, numOfthreads);
 
@@ -239,6 +251,11 @@ namespace PDS_Part_A
                 y++;
             }
 
+            stopwatch1.Stop();
+            Console.WriteLine($"BEFORE THREADS: {stopwatch1.ElapsedMilliseconds} miliseconds");
+            stopwatch1.Reset();
+            stopwatch1.Start();
+
             //search barcodes with threads
             ThreadsWorkBarcodes(numOfthreads, subLists, typesElements);
 
@@ -246,8 +263,10 @@ namespace PDS_Part_A
             //display dictionary with lists of elements for each type
             foreach (KeyValuePair<int, List<string>> element in typesElements)
             {
-             //  Console.WriteLine($"type-amount: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
+                //  Console.WriteLine($"type-amount: {element.Key} | elements: {string.Join(", ", element.Value)} | length: {element.Value.Count}");
             }
+            stopwatch1.Stop();
+            Console.WriteLine($"AFTER FINISH THREADS: {stopwatch1.ElapsedMilliseconds} miliseconds");
         }
         static List<string> GenerateBarcodes()
         {
@@ -294,6 +313,98 @@ namespace PDS_Part_A
             List<string>[] sublists = new List<string>[numOfthreads];
             var splitFactor = Math.Ceiling(Convert.ToDouble(list.Count) / Convert.ToDouble(numOfthreads));
             for (int i = 0; i < numOfthreads; i++)
+                sublists[i] = new List<string>();
+
+            //add elements until the length of sublist is equal to splitFactor
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                int j = Convert.ToInt32(Math.Floor(Convert.ToDouble(i) / Convert.ToDouble(splitFactor)));
+                var value = list[i];
+                sublists[j].Add(value);
+            }
+
+            var u = 1;
+            foreach (var a in sublists)
+            {
+                //Console.WriteLine(string.Join(", ", a));
+                Console.WriteLine($"Length of sublist {u}: {a.Count}");
+                u++;
+            }
+
+            return sublists;
+        }
+        static void ThreadsWorkBarcodes(int numOfthreads, List<string>[] subLists, IDictionary<int, List<string>> Typeselements)
+        {
+            //start threads
+            var threads = new List<Thread>();
+
+            //common buffer for all threads
+            List<string>[] elements = new List<string>[SearchedTypesIndexes.Count];
+            for (var i = 0; i < SearchedTypesIndexes.Count; i++)
+            {
+                elements[i] = new List<string>();
+            }
+
+            for (int i = 0; i < numOfthreads; i++)
+            {
+                var list = subLists[i];
+                var thread = new Thread(() => FindBarcodes(list, Typeselements, elements, i));
+                thread.Start();
+                threads.Add(thread);
+            }
+
+            //stop threads
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+            // return Typeselements;
+
+        }
+        static IDictionary<int, List<string>> FindBarcodes(List<string> list, IDictionary<int, List<string>> typesElements, List<string>[] elements, int Index)
+        {
+            var j = 0;
+            foreach (KeyValuePair<int, int> value in SearchedTypesIndexes)
+            {
+                //List<string> elements = new List<string>();
+                for (var i = 0; i < list.Count; i++)
+                {
+                    var type = value.Key.ToString("000");
+                    var barcode = list[i].Substring(5, 3);
+
+                    if (elements[j].Count < value.Value)
+                    {
+                        if (barcode == type)
+                        {
+                            // Console.WriteLine($"Length: {elements.Count}");
+                            elements[j].Add(list[i]);
+                            //typesElements[typesElements].Add();
+                            Console.WriteLine($"thread({Index}) element: {list[i]} | index: {i} ");
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                // typesElements.Add(value.Key, elements);
+                typesElements[value.Key] = elements[j];
+                j++;
+            }
+
+            return typesElements;
+
+        }
+        
+
+        /*
+        static List<string>[] GenerateBarcodesSubLists(List<string> origList, int numOfthreads)
+        {
+            var list = new List<string>(origList);
+            List<string>[] sublists = new List<string>[numOfthreads];
+            var splitFactor = Math.Ceiling(Convert.ToDouble(list.Count) / Convert.ToDouble(numOfthreads));
+            for (int i = 0; i < numOfthreads; i++)
             {
                 sublists[i] = new List<string>();
             }
@@ -310,6 +421,8 @@ namespace PDS_Part_A
 
             return sublists;
         }
+
+
         static void ThreadsWorkBarcodes(int numOfthreads, List<string>[] subLists, IDictionary<int, List<string>> Typeselements)
         {
 
@@ -361,7 +474,7 @@ namespace PDS_Part_A
 
             return typesElements;
 
-        }
+        }*/
 
         #endregion
     }

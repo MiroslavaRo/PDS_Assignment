@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDS_Part_A", "PDS_Part_A\PDS_Part_A.csproj", "{A2E7B0FD-6612-4099-A9D6-67E2FEF0CEA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDS_Part_A", "PDS_Part_A\PDS_Part_A.csproj", "{A2E7B0FD-6612-4099-A9D6-67E2FEF0CEA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDS_Part_B", "PDS_Part_B\PDS_Part_B.csproj", "{08F73593-09CB-44AB-97BC-086BF0BBC0A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{A2E7B0FD-6612-4099-A9D6-67E2FEF0CEA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2E7B0FD-6612-4099-A9D6-67E2FEF0CEA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2E7B0FD-6612-4099-A9D6-67E2FEF0CEA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08F73593-09CB-44AB-97BC-086BF0BBC0A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08F73593-09CB-44AB-97BC-086BF0BBC0A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08F73593-09CB-44AB-97BC-086BF0BBC0A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08F73593-09CB-44AB-97BC-086BF0BBC0A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,15 @@
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\bin\Debug\net7.0\PDS_Part_B.exe
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\bin\Debug\net7.0\PDS_Part_B.deps.json
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\bin\Debug\net7.0\PDS_Part_B.runtimeconfig.json
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\bin\Debug\net7.0\PDS_Part_B.dll
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\bin\Debug\net7.0\PDS_Part_B.pdb
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.csproj.AssemblyReference.cache
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.AssemblyInfoInputs.cache
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.AssemblyInfo.cs
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.csproj.CoreCompileInputs.cache
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.dll
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\refint\PDS_Part_B.dll
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.pdb
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\PDS_Part_B.genruntimeconfig.cache
+C:\Users\miror\OneDrive - Ye9pfoBh9P\1_VUM_STUDY\3 year\02 PARALLEL AND DISTRIBUTED SYSTEMS 2022-23\Assignment\PDS_Assignment\PDS_Part_B\obj\Debug\net7.0\ref\PDS_Part_B.dll
